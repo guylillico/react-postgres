@@ -1,34 +1,63 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import React from "react"
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const [merchants, setMerchants] = React.useState(false)
+
+  React.useEffect(() => {
+    getMerchant()
+  }, [])
+
+  const getMerchant = () => {
+    fetch("http://localhost:3001")
+      .then((response) => {
+        return response.text()
+      })
+      .then((data) => {
+        setMerchants(data)
+      })
+  }
+
+  const createMerchant = () => {
+    let name = prompt("Enter merchant name")
+    let email = prompt("Enter merchant email")
+    fetch("http://localhost:3001/merchants", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name, email }),
+    })
+      .then((response) => {
+        return response.text()
+      })
+      .then((data) => {
+        alert(data)
+        getMerchant()
+      })
+  }
+
+  const deleteMerchant = () => {
+    let id = prompt("Enter merchant id")
+    fetch(`http://localhost:3001/merchants/${id}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        return response.text()
+      })
+      .then((data) => {
+        alert(data)
+        getMerchant()
+      })
+  }
 
   return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <div>
+      {merchants ? merchants : "There is no merchant data available"}
+      <br />
+      <button onClick={createMerchant}>Add merchant</button>
+      <br />
+      <button onClick={deleteMerchant}>Delete merchant</button>
     </div>
   )
 }
-
 export default App
